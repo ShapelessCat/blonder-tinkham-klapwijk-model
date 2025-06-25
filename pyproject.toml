@@ -1,0 +1,21 @@
+[project]
+name = "blonder-tinkham-klapwijk-model"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "matplotlib>=3.10.3",
+    "more-itertools>=10.7.0",
+    "numpy>=2.3.1",
+    "scipy>=1.16.0",
+]
+
+[dependency-groups]
+dev = [
+    "ipython>=9.3.0",
+]
+test-framework = [
+    "pytest>=8.4.1",
+    "pytest-sugar>=1.0.0",
+]
