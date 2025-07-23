@@ -1,0 +1,18 @@
+[shared_parameters]
+max_voltage = 30
+n_points = 151
+d_temperature = 10
+temperature = 5
+angle = 45         # degree - numpy APIs needs radian
+
+[[gap_specific_parameters]]
+proportion = 0.5
+gamma = 0.01           # Γ - 展宽
+barrier_strength = 20  # Z -
+gap = 4                # Δ (meV)
+
+[[gap_specific_parameters]]
+proportion = 0.5
+gamma = 0.01           # Γ - 展宽
+barrier_strength = 20  # Z -
+gap = 8                # Δ (meV)
