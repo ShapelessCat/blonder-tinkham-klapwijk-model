@@ -10,9 +10,11 @@ proportion = 0.5
 gamma = 0.01           # Γ - 展宽
 barrier_strength = 20  # Z -
 gap = 4                # Δ (meV)
+wave_type = "anisotropic"
 
 [[gap_specific_parameters]]
 proportion = 0.5
 gamma = 0.01           # Γ - 展宽
 barrier_strength = 20  # Z -
 gap = 8                # Δ (meV)
+wave_type = "anisotropic"
