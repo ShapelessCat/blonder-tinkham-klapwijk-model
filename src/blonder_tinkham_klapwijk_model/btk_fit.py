@@ -1,7 +1,7 @@
 import operator
 from dataclasses import dataclass
 from functools import reduce
-from typing import Literal, Callable, final, Self
+from typing import Callable, final, Self
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -12,6 +12,7 @@ from scipy.interpolate import make_interp_spline
 from . import HALF_PI, ABS_ERR_TOLERANCE
 from .anisotropic_wave import anisotropic_wave
 from .config import AppConfig
+from .config.wave_type import WaveType
 from .fermi_window_for_tunneling import fermi_window_for_tunneling
 from .transparency import normal_transparency_of
 
@@ -62,7 +63,7 @@ def plot_btk_tunneling_fit(app_conf: AppConfig) -> None:
     """
     summarized_gap_characteristics = reduce(
         operator.add,
-        (calculate_gap_characteristics(**app_conf.config_set(idx), integr_func_name='aniso_wave')
+        (calculate_gap_characteristics(**app_conf.config_set(idx))
          for idx in range(len(app_conf.gap_specific_parameters)))
     )
     voltage = summarized_gap_characteristics.voltage
@@ -112,12 +113,44 @@ def calculate_gap_characteristics(
         angle: int,             # degree
         # single gap specific
         proportion: float,
-        gamma: float,             # Γ - broadening (meV)
-        barrier_strength: float,  # Z (dimensionless)
-        gap: float,               # Δ (meV)
-        integr_func_name: Literal['aniso_wave', 'ani02_wave'],
+        broadening_parameter: float,  # Γ (meV)
+        barrier_strength: float,      # Z (dimensionless)
+        gap: float,                   # Δ (meV)
+        wave_type: WaveType,
 ) -> GapCharacteristics:
-    normalization_conductance_factor: float = normalization_conductance_factor_of(barrier_strength)
+    match wave_type:
+        case WaveType.ANISOTROPIC:
+            return calculate_anisomorphic_gap_characteristics(
+                max_voltage, n_points, d_temperature, temperature, angle,
+                proportion, broadening_parameter, barrier_strength, gap,
+            )
+        case WaveType.ISOTROPIC:
+            pass
+        case _:
+            raise ValueError("Should never reach here!")
+
+
+def calculate_anisomorphic_gap_characteristics(
+        # shared
+        max_voltage: float,     # mV
+        n_points: int,          # dimensionless
+        d_temperature: float,   # K
+        temperature: float,     # K
+        angle: int,             # degree
+        # single gap specific
+        proportion: float,
+        broadening_parameter: float,  # Γ (meV)
+        barrier_strength: float,      # Z (dimensionless)
+        gap: float,                   # Δ (meV)
+) -> GapCharacteristics:
+    def normalization_conductance_factor_of_anisomorphic_wave() -> float:
+        def f(theta: float):
+            cos_v = np.cos(theta)
+            nt = normal_transparency_of(cos_v, barrier_strength)
+            return nt * cos_v
+        return quad(f, -HALF_PI, HALF_PI)[0]
+
+    normalization_conductance_factor: float = normalization_conductance_factor_of_anisomorphic_wave()
 
     # --- DOS Calculation ---
     pointnum: int = 501
@@ -125,7 +158,7 @@ def calculate_gap_characteristics(
     dos0: NDArray[np.float64] = np.zeros_like(energy)
 
     anisotropic_wave_ = lambda theta, e: anisotropic_wave(
-        theta, e, gamma, barrier_strength, gap, angle, normalization_conductance_factor
+        theta, e, broadening_parameter, barrier_strength, gap, angle, normalization_conductance_factor
     )
     for n in range((pointnum + 1) // 2):
         energy[n] = n * (max_voltage + d_temperature + 1) / 500
@@ -160,10 +193,5 @@ def calculate_gap_characteristics(
     return GapCharacteristics(current * proportion, didv * proportion, voltage)
 
 
-def normalization_conductance_factor_of(barrier_strength: float) -> float:
-    def f(theta: float):
-        cos_v = np.cos(theta)
-        nt = normal_transparency_of(cos_v, barrier_strength)
-        return nt * cos_v
-    return quad(f, -HALF_PI, HALF_PI)[0]
-
+def _normalization_conductance_factor_of_isomorphic_wave(barrier_strength: float) -> float:
+    return 1 / (1 + barrier_strength**2)

@@ -6,7 +6,7 @@ from numpy import sqrt, conj, exp, complex128
 
 def isotropic_wave(
         energy: float,
-        gamma: float,
+        broadening_parameter: float,
         barrier_strength: float,
         gap: float,
 ) -> float:
@@ -16,7 +16,7 @@ def isotropic_wave(
     energy : float
         Energy value(s) in eV (can be scalar or array)
 
-    gamma : float
+    broadening_parameter : float
         Broadening parameter in eV
 
     barrier_strength : float
@@ -30,8 +30,8 @@ def isotropic_wave(
     float
         The calculated integrand value(s)
     """
-    # Complex energy with broadening: complex128(energy) + 1j * gamma
-    complex_energy: Final[complex] = energy + 1j * gamma
+    # Complex energy with broadening: complex128(energy) + 1j * broadening_parameter
+    complex_energy: Final[complex] = energy + 1j * broadening_parameter
 
     # Calculate u^2 and v^2 (coherence factors)
     with np.errstate(divide='ignore', invalid='ignore'):

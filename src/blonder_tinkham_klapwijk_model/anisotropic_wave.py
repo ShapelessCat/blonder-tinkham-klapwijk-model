@@ -8,7 +8,7 @@ from .transparency import normal_transparency_of, superconductor_transparency_of
 def anisotropic_wave(
         theta: float,
         energy: float,
-        gamma: float,
+        broadening_parameter: float,
         barrier_strength: float,
         gap: float,
         angle: float,
@@ -24,7 +24,7 @@ def anisotropic_wave(
     energy: float
         Energy value(s) in eV (can be scalar or array)
 
-    gamma: float
+    broadening_parameter: float
         Broadening parameter in eV
 
     barrier_strength: float
@@ -47,7 +47,7 @@ def anisotropic_wave(
     delta_minus = gap * np.cos(2 * (-theta - np.deg2rad(angle)))**4
 
     # Complex energy with broadening
-    complex_energy: Final[complex] = energy + 1j * gamma
+    complex_energy: Final[complex] = energy + 1j * broadening_parameter
     gamma_plus = gamma_function_of(complex_energy, delta_plus)
     gamma_minus = gamma_function_of(complex_energy, delta_minus)
 
