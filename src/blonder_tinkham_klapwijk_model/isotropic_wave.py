@@ -1,57 +1,59 @@
+from typing import Final
+
 import numpy as np
-from typing import Union
+from numpy import sqrt, conj, exp, complex128
 
 
-# Fundamental constants
-_BOLTZMANN_CONSTANT_EV_PER_K = 8.617333e-5  # eV/K
-_ENERGY_TO_TEMPERATURE_FACTOR = 1 / (_BOLTZMANN_CONSTANT_EV_PER_K * 1000)
-
-
-def calculate_btk_conductance(
-        energy: Union[float, np.ndarray],
-        voltage: float,
-        temperature: float,
-        quasiparticle_broadening: float,
+def isotropic_wave(
+        energy: float,
+        broadening_parameter: float,
         barrier_strength: float,
-        superconducting_gap: float
-) -> Union[float, np.ndarray]:
-    """
-    Calculates the normalized differential conductance using Blonder-Tinkham-Klapwijk (BTK) theory.
+        gap: float,
+        normalization_conductance_factor: float,
+) -> float:
+    """Calculate the integrand function for s-wave superconductivity (BTK theory)
 
-    Args:
-        energy: Input energy values (eV), can be scalar or array
-        voltage: Applied bias voltage (eV)
-        temperature: Measurement temperature (K)
-        quasiparticle_broadening: Phenomenological broadening parameter (eV)
-        barrier_strength: Dimensionless barrier parameter (Z)
-        superconducting_gap: Superconducting energy gap (eV)
+    Parameters:
+    energy : float
+        Energy value(s) in eV (can be scalar or array)
+
+    broadening_parameter : float
+        Broadening parameter in eV
+
+    barrier_strength : float
+        Barrier strength (dimensionless)
+
+    gap : float
+        Superconducting gap (mV) ???
+        Superconducting gap in eV ???
+
+    normalization_conductance_factor: float
+        Normalized conductivity reference value
 
     Returns:
-        Normalized differential conductance (unitless)
+    float
+        The calculated integrand value(s)
     """
-    # Complex energy accounting for quasiparticle lifetime
-    complex_energy = energy + 1j * quasiparticle_broadening
+    # Complex energy with broadening:
+    complex_energy: Final[complex] = complex128(energy) + 1j * broadening_parameter
 
-    # Bogoliubov coherence factors
-    electron_like_coherence = 0.5 * (1 + np.sqrt((complex_energy**2 - superconducting_gap**2) / complex_energy**2))
-    hole_like_coherence = 1 - electron_like_coherence
+    # Calculate u^2 and v^2 (coherence factors)
+    with np.errstate(divide='ignore', invalid='ignore'):
+        u2 = 0.5 * (1 + sqrt((complex_energy**2 - gap**2) / complex_energy**2))
+    v2 = 1 - u2
 
-    # Andreev and normal reflection amplitudes
-    denominator = electron_like_coherence + (electron_like_coherence - hole_like_coherence) * barrier_strength**2
+    # Denominator and normalization factor
+    denom = u2 + (u2 - v2) * barrier_strength ** 2
+    sigmanorm = normalization_conductance_factor
 
-    andreev_reflection_amplitude = np.sqrt(electron_like_coherence * hole_like_coherence) / denominator
-    normal_reflection_amplitude = -(electron_like_coherence - hole_like_coherence) * (barrier_strength**2 + 1j*barrier_strength) / denominator
+    # Calculate a and b coefficients
+    a = sqrt(u2) * sqrt(v2) / denom
+    b = -(u2 - v2) * complex128(barrier_strength ** 2, barrier_strength) / denom
 
-    # Probability densities
-    andreev_probability = np.abs(andreev_reflection_amplitude)**2
-    normal_reflection_probability = np.abs(normal_reflection_amplitude)**2
+    # Calculate probabilities
+    aa = conj(a) * a
+    bb = conj(b) * b
 
-    # Fermi-Dirac distributions
-    fermi_zero_bias = 1 / (1 + np.exp(_ENERGY_TO_TEMPERATURE_FACTOR * energy / temperature))
-    fermi_at_voltage = 1 / (1 + np.exp(_ENERGY_TO_TEMPERATURE_FACTOR * (energy - voltage) / temperature))
-
-    # Normalization and conductance calculation
-    normal_state_conductance = 1 / (1 + barrier_strength**2)
-    differential_conductance = (fermi_at_voltage - fermi_zero_bias) * (1 + andreev_probability - normal_reflection_probability) / normal_state_conductance
-
-    return differential_conductance
+    # Final integrand calculation
+    result = np.nan_to_num((1 + aa - bb) / sigmanorm, nan=0.0, posinf=0.0, neginf=0.0)
+    return np.real(result)
