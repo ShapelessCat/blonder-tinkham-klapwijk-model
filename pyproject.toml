@@ -15,8 +15,36 @@ dependencies = [
 [dependency-groups]
 dev = [
     "ipython>=9.3.0",
+    "mypy>=1.17.0",
+    "ruff>=0.12.4",
 ]
 test-framework = [
     "pytest>=8.4.1",
     "pytest-sugar>=1.0.0",
 ]
+
+[tool.ruff]
+line-length = 88
+include = ["src/**/*.py", "tests/**/*.py"]
+
+[tool.ruff.format]
+quote-style = "preserve"
+
+[tool.ruff.lint]
+extend-select = ["I"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["orchestrator"]
+
+[tool.mypy]
+follow_imports = "silent"
+show_column_numbers = true
+ignore_missing_imports = true
+
+[[tool.uv.index]]
+name = "aliyun-pypi" # Optional name for the index.
+url = "http://mirrors.aliyun.com/pypi/simple"
+default = true
+
+[[tool.uv.index]]
+url = "https://pypi.org/simple"
