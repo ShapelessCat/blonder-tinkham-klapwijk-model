@@ -12,6 +12,9 @@ dependencies = [
     "scipy>=1.16.0",
 ]
 
+[project.scripts]
+"btk.x" = "blonder_tinkham_klapwijk_model.main:main"
+
 [dependency-groups]
 dev = [
     "ipython>=9.3.0",

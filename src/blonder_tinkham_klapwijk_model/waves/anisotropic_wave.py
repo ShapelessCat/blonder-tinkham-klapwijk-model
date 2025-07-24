@@ -2,7 +2,10 @@ from typing import Final
 
 import numpy as np
 
-from .transparency import normal_transparency_of, superconductor_transparency_of
+from blonder_tinkham_klapwijk_model.transparency import (
+    normal_transparency_of,
+    superconductor_transparency_of,
+)
 
 
 def anisotropic_wave(

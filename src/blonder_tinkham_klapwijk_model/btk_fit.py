@@ -10,12 +10,12 @@ from scipy.integrate import quad
 from scipy.interpolate import make_interp_spline
 
 from . import ABS_ERR_TOLERANCE, HALF_PI
-from .anisotropic_wave import anisotropic_wave
 from .config import AppConfig
 from .config.wave_type import WaveType
 from .fermi_window_for_tunneling import fermi_window_for_tunneling
-from .isotropic_wave import isotropic_wave
 from .transparency import normal_transparency_of
+from .waves.anisotropic_wave import anisotropic_wave
+from .waves.isotropic_wave import isotropic_wave
 
 
 @final
