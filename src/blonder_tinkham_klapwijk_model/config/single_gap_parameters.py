@@ -1,5 +1,5 @@
 from collections.abc import Mapping
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from typing import final
 
 from .wave_type import WaveType
@@ -17,7 +17,7 @@ class SingleGapParameters(Mapping):
     # single gap specific
     proportion: float
     broadening_parameter: float  # Γ (meV)
-    barrier_strength: float      # Z (dimensionless)
+    barrier_strength: float  # Z (dimensionless)
     gap: float  # Δ (meV)
     wave_type: WaveType
 

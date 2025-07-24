@@ -6,13 +6,13 @@ from .transparency import normal_transparency_of, superconductor_transparency_of
 
 
 def anisotropic_wave(
-        theta: float,
-        energy: float,
-        broadening_parameter: float,
-        barrier_strength: float,
-        gap: float,
-        angle: float,
-        normalization_conductance_factor: float
+    theta: float,
+    energy: float,
+    broadening_parameter: float,
+    barrier_strength: float,
+    gap: float,
+    angle: float,
+    normalization_conductance_factor: float,
 ) -> float:
     """Calculates the integral function for superconducting transport calculations.
 
@@ -43,8 +43,8 @@ def anisotropic_wave(
     -------
         Calculated conductivity function value(s)
     """
-    delta_plus = gap * np.cos(2 * (theta - np.deg2rad(angle)))**4
-    delta_minus = gap * np.cos(2 * (-theta - np.deg2rad(angle)))**4
+    delta_plus = gap * np.cos(2 * (theta - np.deg2rad(angle))) ** 4
+    delta_minus = gap * np.cos(2 * (-theta - np.deg2rad(angle))) ** 4
 
     # Complex energy with broadening
     complex_energy: Final[complex] = energy + 1j * broadening_parameter
@@ -53,9 +53,16 @@ def anisotropic_wave(
 
     cos_theta = np.cos(theta)
     normal_transparency = normal_transparency_of(cos_theta, barrier_strength)
-    superconductor_transparency = superconductor_transparency_of(normal_transparency, gamma_plus, gamma_minus)
-    return superconductor_transparency * normal_transparency * cos_theta / normalization_conductance_factor
+    superconductor_transparency = superconductor_transparency_of(
+        normal_transparency, gamma_plus, gamma_minus
+    )
+    return (
+        superconductor_transparency
+        * normal_transparency
+        * cos_theta
+        / normalization_conductance_factor
+    )
 
 
 def gamma_function_of(energy: complex, delta: float) -> complex:
-    return energy / np.abs(delta) - np.sqrt((energy / np.abs(delta))**2 - 1)
+    return energy / np.abs(delta) - np.sqrt((energy / np.abs(delta)) ** 2 - 1)

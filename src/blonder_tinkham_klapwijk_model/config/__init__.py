@@ -2,8 +2,8 @@ import tomllib
 
 from .app_config import (
     AppConfig,
-    SharedParameters,
     GapSpecificParameters,
+    SharedParameters,
     SingleGapParameters,
 )
 

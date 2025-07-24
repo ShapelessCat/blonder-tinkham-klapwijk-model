@@ -4,12 +4,13 @@ from typing import Final
 import numpy as np
 
 _BOLTZMANN_CONSTANT: Final[float] = 0.08617  # in meV/K
-_MILLIVOLT_TO_meV: Final[float] = 1.0        # 1 mV ≈ 1 meV in natural units
+_MILLIVOLT_TO_meV: Final[float] = 1.0  # 1 mV ≈ 1 meV in natural units
+
 
 def fermi_window_for_tunneling(
-        energy: float,        # in meV/K
-        bias_voltage: float,  # in mV
-        temperature: float    # in K
+    energy: float,  # in meV/K
+    bias_voltage: float,  # in mV
+    temperature: float,  # in K
 ) -> float:
     """Computes the Fermi window f(E-eV) - f(E) for tunneling spectroscopy.
 
@@ -37,10 +38,7 @@ def fermi_window_for_tunneling(
     return shifted_fermi - unshifted_fermi
 
 
-def _fermi_dirac_distribution(
-        energy: float,
-        temperature: float
-) -> float:
+def _fermi_dirac_distribution(energy: float, temperature: float) -> float:
     """Computes the Fermi-Dirac distribution f(E) = 1/(1 + exp(E/(kB * T))).
 
     kB in the above formula is Boltzmann constant.

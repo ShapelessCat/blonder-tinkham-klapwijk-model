@@ -1,15 +1,15 @@
 from typing import Final
 
 import numpy as np
-from numpy import sqrt, conj, exp, complex128
+from numpy import complex128, conj, sqrt
 
 
 def isotropic_wave(
-        energy: float,
-        broadening_parameter: float,
-        barrier_strength: float,
-        gap: float,
-        normalization_conductance_factor: float,
+    energy: float,
+    broadening_parameter: float,
+    barrier_strength: float,
+    gap: float,
+    normalization_conductance_factor: float,
 ) -> float:
     """Calculate the integrand function for s-wave superconductivity (BTK theory)
 
@@ -43,12 +43,12 @@ def isotropic_wave(
     v2 = 1 - u2
 
     # Denominator and normalization factor
-    denom = u2 + (u2 - v2) * barrier_strength ** 2
+    denom = u2 + (u2 - v2) * barrier_strength**2
     sigmanorm = normalization_conductance_factor
 
     # Calculate a and b coefficients
     a = sqrt(u2) * sqrt(v2) / denom
-    b = -(u2 - v2) * complex128(barrier_strength ** 2, barrier_strength) / denom
+    b = -(u2 - v2) * complex128(barrier_strength**2, barrier_strength) / denom
 
     # Calculate probabilities
     aa = conj(a) * a

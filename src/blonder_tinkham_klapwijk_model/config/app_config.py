@@ -1,6 +1,6 @@
 import logging
 from collections.abc import Mapping
-from typing import List, final, Self
+from typing import List, Self, final
 
 from pydantic import BaseModel, model_validator
 
@@ -36,7 +36,7 @@ class SharedParameters(_FrozenBasedModelWithMapping):
 class GapSpecificParameters(_FrozenBasedModelWithMapping):
     proportion: float
     broadening_parameter: float  # Γ (meV)
-    barrier_strength: float      # Z (dimensionless)
+    barrier_strength: float  # Z (dimensionless)
     gap: float  # Δ (meV)
     wave_type: WaveType
 

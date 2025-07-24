@@ -7,17 +7,15 @@ def normal_transparency_of(cos_theta: float, barrier_strength: float) -> float:
     else:
         return cos_theta**2 / (cos_theta**2 + barrier_strength**2)
 
-# def superconductor_transparency_of(normal_transparency: float, gamma_plus: complex, gamma_minus: complex) -> complex:
-#     numerator = 1 + normal_transparency * np.abs(gamma_plus)**2 + (normal_transparency - 1) * (gamma_plus * gamma_minus)**2
-#     if np.isclose(np.abs(gamma_plus), 0.0) and np.isclose(np.abs(gamma_minus), 0.0):
-#         return numerator
-#     else:
-#         phase = -1j * np.log((gamma_plus * np.abs(gamma_minus)) / (gamma_minus * np.abs(gamma_plus)))
-#         denominator = (1 + (normal_transparency - 1) * gamma_plus * gamma_minus * phase * np.exp(1j * phase))**2
-#         return numerator / denominator
 
-def superconductor_transparency_of(normal_transparency: float, gamma_plus: complex, gamma_minus: complex) -> complex:
-    numerator = 1 + normal_transparency * np.abs(gamma_plus)**2 + (normal_transparency - 1) * np.abs(gamma_plus * gamma_minus)**2
+def superconductor_transparency_of(
+    normal_transparency: float, gamma_plus: complex, gamma_minus: complex
+) -> complex:
+    numerator = (
+        1
+        + normal_transparency * np.abs(gamma_plus) ** 2
+        + (normal_transparency - 1) * np.abs(gamma_plus * gamma_minus) ** 2
+    )
 
     # Handle edge cases where gamma values are zero or very small
     if np.isclose(gamma_plus, 0.0) or np.isclose(gamma_minus, 0.0):
@@ -30,7 +28,16 @@ def superconductor_transparency_of(normal_transparency: float, gamma_plus: compl
         if np.isclose(ratio, 0.0):
             return numerator
         phase = -1j * np.log(ratio)
-        denominator = np.abs(1 + (normal_transparency - 1) * gamma_plus * gamma_minus * np.exp(1j * phase))**2
+        denominator = (
+            np.abs(
+                1
+                + (normal_transparency - 1)
+                * gamma_plus
+                * gamma_minus
+                * np.exp(1j * phase)
+            )
+            ** 2
+        )
         return numerator / denominator
     except (ZeroDivisionError, RuntimeWarning):
         return numerator
