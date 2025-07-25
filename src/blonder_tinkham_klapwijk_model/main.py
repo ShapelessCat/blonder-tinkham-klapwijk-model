@@ -3,7 +3,7 @@ import argparse
 import numpy as np
 from numpy.typing import NDArray
 
-from blonder_tinkham_klapwijk_model.btk_fit import (
+from blonder_tinkham_klapwijk_model.btk_calculation import (
     plot_btk_tunneling_fit,
     plot_experiment_result,
 )
