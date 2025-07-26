@@ -70,7 +70,7 @@ def plot_btk_tunneling_fit(app_conf: AppConfig) -> None:
         operator.add,
         (
             calculate_gap_characteristics(**app_conf.config_set(idx))
-            for idx in range(len(app_conf.gap_specific_parameters))
+            for idx in range(len(app_conf.wave_specific_parameters))
         ),
     )
     voltage = summarized_gap_characteristics.voltage

@@ -33,7 +33,7 @@ class SharedParameters(_FrozenBasedModelWithMapping):
 
 
 @final
-class GapSpecificParameters(_FrozenBasedModelWithMapping):
+class WaveSpecificParameters(_FrozenBasedModelWithMapping):
     proportion: float
     broadening_parameter: float  # Γ (meV)
     barrier_strength: float  # Z (dimensionless)
@@ -44,24 +44,24 @@ class GapSpecificParameters(_FrozenBasedModelWithMapping):
 @final
 class AppConfig(BaseModel):
     shared_parameters: SharedParameters
-    gap_specific_parameters: List[GapSpecificParameters]
+    wave_specific_parameters: List[WaveSpecificParameters]
 
     @model_validator(mode="after")
     def validate_voltages(self) -> Self:
-        if (v := sum(sgp.proportion for sgp in self.gap_specific_parameters)) != 1:
+        if (v := sum(wgp.proportion for wgp in self.wave_specific_parameters)) != 1:
             raise ValueError(f"The sum of all proportions should be 1. Now it's {v}")
         return self
 
     def config_set(self, index: int) -> SingleGapParameters:
         try:
-            gap_specific_parameters = self.gap_specific_parameters[index]
+            wave_specific_parameters = self.wave_specific_parameters[index]
         except IndexError:
             logging.error(
-                f"Config only has {len(self.gap_specific_parameters)} set(s) of gap specific parameters."
+                f"Config only has {len(self.wave_specific_parameters)} set(s) of gap specific parameters."
             )
             raise
 
-        return SingleGapParameters(**self.shared_parameters, **gap_specific_parameters)
+        return SingleGapParameters(**self.shared_parameters, **wave_specific_parameters)
 
     class Config:
         frozen = True

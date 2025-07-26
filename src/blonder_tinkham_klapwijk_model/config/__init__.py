@@ -2,7 +2,7 @@ import tomllib
 
 from .app_config import (
     AppConfig,
-    GapSpecificParameters,
+    WaveSpecificParameters,
     SharedParameters,
     SingleGapParameters,
 )
@@ -10,7 +10,7 @@ from .app_config import (
 __all__ = [
     "AppConfig",
     "SharedParameters",
-    "GapSpecificParameters",
+    "WaveSpecificParameters",
     "SingleGapParameters",
     "load_config",
 ]
