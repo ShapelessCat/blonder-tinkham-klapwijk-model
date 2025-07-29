@@ -5,7 +5,7 @@ from numpy.typing import NDArray
 from .btk_calculation import GapCharacteristics
 
 
-def plot_experiment_result(
+def plot_experiment_measurement(
     max_vol: float,
     *,
     bias_voltage: NDArray[np.float64],
@@ -22,7 +22,6 @@ def plot_experiment_result(
     plt.xticks(
         np.arange(start=-max_vol, stop=max_vol + max_vol / 10, step=max_vol / 10)
     )
-    # TODO: yticks
     plt.grid(True, linestyle='--', linewidth=0.5, alpha=0.5)
     plt.pause(0.1)
 
@@ -41,20 +40,26 @@ def plot_btk_tunneling_fit(
     voltage = summarized_gap_characteristics.voltage
     current = summarized_gap_characteristics.current
     normalized_conductance = summarized_gap_characteristics.normalized_conductance
+
     # --- Plot results ---
-    fig, ax1 = plt.subplots()
-    ax2 = ax1.twinx()
+    fig, axes1 = plt.subplots()
+    axes2 = axes1.twinx()
 
-    ax1.plot(voltage, normalized_conductance, 'r-', linewidth=2)
-    ax2.plot(voltage, current, 'b-', linewidth=2)
+    axes1.plot(voltage, normalized_conductance, 'r-', linewidth=2)
+    axes2.plot(voltage, current, 'b-', linewidth=2)
 
-    ax1.set_xlabel('Bias Voltage - V (mV)')
-    ax1.set_ylabel('Normalized Conductance - dI/dV (unit?)', color='r')
-    ax2.set_ylabel('Current - I (mA)', color='b')
+    axes1.set_xlabel('Bias Voltage - V (mV)')
+    axes1.set_ylabel('Normalized Conductance - dI/dV (unit?)', color='r')
+    axes2.set_ylabel('Current - I (mA)', color='b')
 
-    ax1.set_xlim((-max_voltage, max_voltage))
+    axes1.set_xlim((-max_voltage, max_voltage))
+    axes1.tick_params(axis='both', labelsize=6)
+    axes1.set_xticks(
+        np.arange(start=-max_voltage, stop=max_voltage + max_voltage / 10, step=max_voltage / 10)
+    )
+    axes1.grid(True, linestyle='--', linewidth=0.5, alpha=0.5)
+
     # ax1.set_ylim((0.99, 1.02))
-    # ax2.set_ylim(-max_voltage, max_voltage)
     plt.show()
 
     # --- Save results ---

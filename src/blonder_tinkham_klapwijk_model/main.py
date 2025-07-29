@@ -11,7 +11,7 @@ from blonder_tinkham_klapwijk_model.btk_calculation import (
 from blonder_tinkham_klapwijk_model.config import load_config
 from blonder_tinkham_klapwijk_model.plotting import (
     plot_btk_tunneling_fit,
-    plot_experiment_result,
+    plot_experiment_measurement,
 )
 
 CONFIG_PATH = "/Users/shapeless_cat/Projects/blonder-tinkham-klapwijk-model/src/blonder_tinkham_klapwijk_model/input_parameters.toml"
@@ -33,11 +33,12 @@ def main():
     data: NDArray[np.float64] = np.loadtxt(args.data)
     bias_voltage_: NDArray[np.float64] = data[:, 0]
     normalized_conductance_: NDArray[np.float64] = data[:, 1]
-    plot_experiment_result(
+    plot_experiment_measurement(
         app_config_.shared_parameters.max_voltage,
         bias_voltage=bias_voltage_,
         normalized_conductance=normalized_conductance_,
     )
+
     summarized_gap_characteristics = reduce(
         operator.add,
         (
@@ -45,7 +46,6 @@ def main():
             for idx in range(len(app_config_.wave_specific_parameters))
         ),
     )
-
     plot_btk_tunneling_fit(
         summarized_gap_characteristics, app_config_.shared_parameters.max_voltage
     )
