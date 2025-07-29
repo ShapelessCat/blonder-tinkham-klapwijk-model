@@ -44,10 +44,6 @@ follow_imports = "silent"
 show_column_numbers = true
 ignore_missing_imports = true
 
-[[tool.uv.index]]
-name = "aliyun-pypi" # Optional name for the index.
-url = "http://mirrors.aliyun.com/pypi/simple"
-default = true
-
-[[tool.uv.index]]
-url = "https://pypi.org/simple"
+#[[tool.uv.index]]
+#name = "aliyun-pypi" # Optional name for the index.
+#url = "http://mirrors.aliyun.com/pypi/simple"
