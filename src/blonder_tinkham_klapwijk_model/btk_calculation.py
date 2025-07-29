@@ -11,7 +11,7 @@ from scipy.interpolate import make_interp_spline
 
 from . import ABS_ERR_TOLERANCE, HALF_PI
 from .config import AppConfig
-from .config.gap_config import SimpleGapConfig, ComplexGapConfig
+from .config.gap_config import ComplexGapConfig, SimpleGapConfig
 from .config.wave_type import WaveType
 from .fermi_window_for_tunneling import fermi_window_for_tunneling
 from .transparency import normal_transparency_of
@@ -140,7 +140,6 @@ def calculate_gap_characteristics(
                 n_points,
                 d_temperature,
                 temperature,
-                angle,  # `angle` is not in use
                 proportion,
                 broadening_parameter,
                 barrier_strength,
@@ -178,15 +177,16 @@ def calculate_anisomorphic_gap_characteristics(
     energy: NDArray[np.float64] = np.zeros((pointnum + 1) // 2)
     dos0: NDArray[np.float64] = np.zeros_like(energy)
 
-    anisotropic_wave_ = lambda theta, e: anisotropic_wave(
-        theta,
-        e,
-        broadening_parameter,
-        barrier_strength,
-        gap_config,
-        angle,
-        normalization_conductance_factor,
-    )
+    def anisotropic_wave_(theta, e):
+        return anisotropic_wave(
+            theta,
+            e,
+            broadening_parameter,
+            barrier_strength,
+            gap_config,
+            angle,
+            normalization_conductance_factor,
+        )
     for n in range((pointnum + 1) // 2):
         energy[n] = n * (max_voltage + d_temperature + 1) / 500
         dos0[n] = quad(
@@ -245,7 +245,6 @@ def calculate_isomorphic_gap_characteristics(
     n_points: int,  # dimensionless
     d_temperature: float,  # K
     temperature: float,  # K
-    angle: int,  # degree
     # single gap specific
     proportion: float,
     broadening_parameter: float,  # Γ (meV)
@@ -262,9 +261,10 @@ def calculate_isomorphic_gap_characteristics(
     energy: NDArray[np.float64] = np.zeros((pointnum + 1) // 2)
     dos0: NDArray[np.float64] = np.zeros_like(energy)
 
-    isotropic_wave_ = lambda e: isotropic_wave(
-        e, broadening_parameter, barrier_strength, gap, normalization_conductance_factor
-    )
+    def isotropic_wave_(e):
+        return isotropic_wave(
+            e, broadening_parameter, barrier_strength, gap, normalization_conductance_factor
+        )
 
     # energy: float,
     # broadening_parameter: float,

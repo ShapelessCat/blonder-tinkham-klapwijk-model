@@ -3,8 +3,8 @@ from typing import Final
 import numpy as np
 
 from blonder_tinkham_klapwijk_model.config.gap_config import (
-    SimpleGapConfig,
     ComplexGapConfig,
+    SimpleGapConfig,
 )
 from blonder_tinkham_klapwijk_model.transparency import (
     normal_transparency_of,
