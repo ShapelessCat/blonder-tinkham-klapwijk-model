@@ -1,7 +1,7 @@
 import operator
 from dataclasses import dataclass
 from functools import reduce
-from typing import Callable, Self, final
+from typing import Self, final
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,6 +11,7 @@ from scipy.interpolate import make_interp_spline
 
 from . import ABS_ERR_TOLERANCE, HALF_PI
 from .config import AppConfig
+from .config.gap_config import SimpleGapConfig, ComplexGapConfig
 from .config.wave_type import WaveType
 from .fermi_window_for_tunneling import fermi_window_for_tunneling
 from .transparency import normal_transparency_of
@@ -106,12 +107,6 @@ def plot_btk_tunneling_fit(app_conf: AppConfig) -> None:
     # print(f"Computation time: {time.time() - start_time:.2f} seconds")
 
 
-# ===== Type Aliases =====
-IntegrandFunc = Callable[
-    [float, float, float, float, float, float, float, float, float], float
-]
-
-
 def calculate_gap_characteristics(
     # shared
     max_voltage: float,  # mV
@@ -123,11 +118,11 @@ def calculate_gap_characteristics(
     proportion: float,
     broadening_parameter: float,  # Γ (meV)
     barrier_strength: float,  # Z (dimensionless)
-    gap: float,  # Δ (meV)
+    gap_config: SimpleGapConfig | ComplexGapConfig,  # Δ (meV)
     wave_type: WaveType,
 ) -> GapCharacteristics:
-    match wave_type:
-        case WaveType.ANISOTROPIC:
+    match (wave_type, gap_config):
+        case (WaveType.ANISOTROPIC, _):
             return calculate_anisomorphic_gap_characteristics(
                 max_voltage,
                 n_points,
@@ -137,9 +132,9 @@ def calculate_gap_characteristics(
                 proportion,
                 broadening_parameter,
                 barrier_strength,
-                gap,
+                gap_config,
             )
-        case WaveType.ISOTROPIC:
+        case (WaveType.ISOTROPIC, _) if isinstance(gap_config, SimpleGapConfig):
             return calculate_isomorphic_gap_characteristics(
                 max_voltage,
                 n_points,
@@ -149,7 +144,7 @@ def calculate_gap_characteristics(
                 proportion,
                 broadening_parameter,
                 barrier_strength,
-                gap,
+                gap_config.gap,
             )
         case _:
             raise ValueError("Should never reach here!")
@@ -166,7 +161,7 @@ def calculate_anisomorphic_gap_characteristics(
     proportion: float,
     broadening_parameter: float,  # Γ (meV)
     barrier_strength: float,  # Z (dimensionless)
-    gap: float,  # Δ (meV)
+    gap_config: SimpleGapConfig | ComplexGapConfig,  # Δ (meV)
 ) -> GapCharacteristics:
     def compute_normalization_conductance_factor() -> float:
         def f(theta: float):
@@ -188,7 +183,7 @@ def calculate_anisomorphic_gap_characteristics(
         e,
         broadening_parameter,
         barrier_strength,
-        gap,
+        gap_config,
         angle,
         normalization_conductance_factor,
     )

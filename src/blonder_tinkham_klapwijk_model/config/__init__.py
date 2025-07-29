@@ -2,9 +2,9 @@ import tomllib
 
 from .app_config import (
     AppConfig,
-    WaveSpecificParameters,
     SharedParameters,
     SingleGapParameters,
+    WaveSpecificParameters,
 )
 
 __all__ = [

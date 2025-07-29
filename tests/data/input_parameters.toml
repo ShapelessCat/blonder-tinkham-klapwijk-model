@@ -9,12 +9,12 @@ angle = 45         # degree - numpy APIs needs radian
 proportion = 0.5
 broadening_parameter = 0.01  # Γ (meV)
 barrier_strength = 20        # Z - dimensionless
-gap = 4                      # Δ (meV)
-wave_type = "isotropic"
+gap_config = { gap_plus = 4, gap_minus = 4 } # Δ (meV)
+wave_type = "anisotropic"
 
 [[wave_specific_parameters]]
 proportion = 0.5
 broadening_parameter = 0.01  # Γ (meV)
 barrier_strength = 20        # Z - dimensionless
-gap = 8                      # Δ (meV)
+gap_config = { gap = 8 }     # Δ (meV)
 wave_type = "isotropic"

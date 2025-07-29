@@ -2,6 +2,10 @@ from typing import Final
 
 import numpy as np
 
+from blonder_tinkham_klapwijk_model.config.gap_config import (
+    SimpleGapConfig,
+    ComplexGapConfig,
+)
 from blonder_tinkham_klapwijk_model.transparency import (
     normal_transparency_of,
     superconductor_transparency_of,
@@ -13,7 +17,7 @@ def anisotropic_wave(
     energy: float,
     broadening_parameter: float,
     barrier_strength: float,
-    gap: float,
+    gap_config: SimpleGapConfig | ComplexGapConfig,
     angle: float,
     normalization_conductance_factor: float,
 ) -> float:
@@ -21,33 +25,43 @@ def anisotropic_wave(
 
     Parameters
     ----------
-    theta: float
+    theta : float
         Angle(s) in radians (can be scalar or array)
 
-    energy: float
+    energy : float
         Energy value(s) in eV (can be scalar or array)
 
-    broadening_parameter: float
+    broadening_parameter : float
         Broadening parameter in eV
 
-    barrier_strength: float
+    barrier_strength : float
         Barrier strength (dimensionless)
 
-    gap: float
-       Superconducting gap in eV
+    gap_config : SimpleGapConfig | ComplexGapConfig
+       Superconducting gap or (gap_plus, gap_minus) in eV
 
-    angle: float
+    angle : float
         Crystallographic orientation angle in degrees
 
-    normalization_conductance_factor: float
+    normalization_conductance_factor : float
         Normalized conductivity reference value
 
     Returns
     -------
         Calculated conductivity function value(s)
     """
-    delta_plus = gap * np.cos(2 * (theta - np.deg2rad(angle))) ** 4
-    delta_minus = gap * np.cos(2 * (-theta - np.deg2rad(angle))) ** 4
+    match gap_config:
+        case SimpleGapConfig() as s:
+            gap_plus = s.gap
+            gap_minus = s.gap
+        case ComplexGapConfig() as c:
+            gap_plus = c.gap_plus
+            gap_minus = c.gap_minus
+        case _:
+            raise ValueError("Should never reach here!")
+
+    delta_plus = gap_plus * np.cos(2 * (theta - np.deg2rad(angle))) ** 4
+    delta_minus = gap_minus * np.cos(2 * (-theta - np.deg2rad(angle))) ** 4
 
     # Complex energy with broadening
     complex_energy: Final[complex] = energy + 1j * broadening_parameter
