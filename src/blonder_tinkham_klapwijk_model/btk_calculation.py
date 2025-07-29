@@ -1,16 +1,12 @@
-import operator
 from dataclasses import dataclass
-from functools import reduce
 from typing import Self, final
 
-import matplotlib.pyplot as plt
 import numpy as np
 from numpy.typing import NDArray
 from scipy.integrate import quad
 from scipy.interpolate import make_interp_spline
 
 from . import ABS_ERR_TOLERANCE, HALF_PI
-from .config import AppConfig
 from .config.gap_config import ComplexGapConfig, SimpleGapConfig
 from .config.wave_type import WaveType
 from .fermi_window_for_tunneling import fermi_window_for_tunneling
@@ -36,75 +32,6 @@ class GapCharacteristics:
             self.normalized_conductance + other.normalized_conductance,
             self.voltage,
         )
-
-
-def plot_experiment_result(
-    max_vol: float,
-    *,
-    bias_voltage: NDArray[np.float64],
-    normalized_conductance: NDArray[np.float64],
-):
-    plt.figure(1)
-    plt.plot(bias_voltage, normalized_conductance, 'ob', markersize=1)
-
-    plt.xlabel('Bias Voltage (mV)')
-    plt.ylabel('Normalized Conductance')
-
-    plt.xlim((-max_vol, max_vol))
-    plt.tick_params(axis='both', labelsize=6)
-    plt.xticks(
-        np.arange(start=-max_vol, stop=max_vol + max_vol / 10, step=max_vol / 10)
-    )
-    # TODO: yticks
-    plt.grid(True, linestyle='--', linewidth=0.5, alpha=0.5)
-    plt.pause(0.1)
-
-
-def plot_btk_tunneling_fit(app_conf: AppConfig) -> None:
-    """BTK fitting code.
-
-    Parameters
-    __________
-    input_parameters : AppConfig
-    """
-    summarized_gap_characteristics = reduce(
-        operator.add,
-        (
-            calculate_gap_characteristics(**app_conf.config_set(idx))
-            for idx in range(len(app_conf.wave_specific_parameters))
-        ),
-    )
-    voltage = summarized_gap_characteristics.voltage
-    current = summarized_gap_characteristics.current
-    normalized_conductance = summarized_gap_characteristics.normalized_conductance
-    # --- Plot results ---
-    fig, ax1 = plt.subplots()
-    ax2 = ax1.twinx()
-
-    ax1.plot(voltage, normalized_conductance, 'r-', linewidth=2)
-    ax2.plot(voltage, current, 'b-', linewidth=2)
-
-    ax1.set_xlabel('Bias Voltage - V (mV)')
-    ax1.set_ylabel('Normalized Conductance - dI/dV (unit?)', color='r')
-    ax2.set_ylabel('Current - I (mA)', color='b')
-
-    max_voltage = app_conf.shared_parameters.max_voltage
-    ax1.set_xlim((-max_voltage, max_voltage))
-    # ax1.set_ylim((0.99, 1.02))
-    # ax2.set_ylim(-max_voltage, max_voltage)
-    plt.show()
-
-    # --- Save results ---
-    Z: NDArray[np.float64] = np.column_stack((voltage, normalized_conductance, current))
-    # parameters: NDArray[np.float64] = np.array([
-    #     [app_conf.shared_parameters.temperature, proportion, 22],
-    #     [gamma1, barrier1, gap1],
-    #     [gamma2, barrier2, gap2],
-    #     [angle1, angle2, 0]
-    # ])
-    # np.savetxt(path2result, Z, fmt='%.6f')
-    #
-    # print(f"Computation time: {time.time() - start_time:.2f} seconds")
 
 
 def calculate_gap_characteristics(
@@ -187,6 +114,7 @@ def calculate_anisomorphic_gap_characteristics(
             angle,
             normalization_conductance_factor,
         )
+
     for n in range((pointnum + 1) // 2):
         energy[n] = n * (max_voltage + d_temperature + 1) / 500
         dos0[n] = quad(
@@ -263,7 +191,11 @@ def calculate_isomorphic_gap_characteristics(
 
     def isotropic_wave_(e):
         return isotropic_wave(
-            e, broadening_parameter, barrier_strength, gap, normalization_conductance_factor
+            e,
+            broadening_parameter,
+            barrier_strength,
+            gap,
+            normalization_conductance_factor,
         )
 
     # energy: float,
