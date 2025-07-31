@@ -55,7 +55,11 @@ def plot_btk_tunneling_fit(
     axes1.set_xlim((-max_voltage, max_voltage))
     axes1.tick_params(axis='both', labelsize=6)
     axes1.set_xticks(
-        np.arange(start=-max_voltage, stop=max_voltage + max_voltage / 10, step=max_voltage / 10)
+        np.arange(
+            start=-max_voltage,
+            stop=max_voltage + max_voltage / 10,
+            step=max_voltage / 10,
+        )
     )
     axes1.grid(True, linestyle='--', linewidth=0.5, alpha=0.5)
 

@@ -1,6 +1,6 @@
 import logging
-from collections.abc import Iterator
-from typing import Any, List, Mapping, Self, final
+from collections.abc import Iterator, Mapping
+from typing import Any, Self, final
 
 from pydantic import BaseModel, model_validator
 
@@ -60,7 +60,7 @@ class WaveSpecificParameters(FrozenBaseModel, Mapping):
 @final
 class AppConfig(FrozenBaseModel):
     shared_parameters: SharedParameters
-    wave_specific_parameters: List[WaveSpecificParameters]
+    wave_specific_parameters: list[WaveSpecificParameters]
 
     @model_validator(mode="after")
     def validate_voltages(self) -> Self:
