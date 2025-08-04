@@ -46,9 +46,7 @@ def main():
             for idx in range(len(app_config_.wave_specific_parameters))
         ),
     )
-    plot_btk_tunneling_fit(
-        summarized_gap_characteristics, app_config_.shared_parameters.max_voltage
-    )
+    plot_btk_tunneling_fit(summarized_gap_characteristics)
 
 
 if __name__ == '__main__':
