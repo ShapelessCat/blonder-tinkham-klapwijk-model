@@ -1,6 +1,6 @@
 import logging
-from collections.abc import Iterator, Mapping
-from typing import Any, Self, final
+from collections.abc import Mapping
+from typing import Any, final, KeysView, Generator
 
 from pydantic import BaseModel, model_validator
 
@@ -43,10 +43,10 @@ class WaveSpecificParameters(FrozenBaseModel, Mapping):
                 pass
         return self
 
-    def keys(self) -> Iterator[str]:
-        return iter(self.__class__.model_fields.keys())
+    def keys(self) -> KeysView[str]:
+        return self.__class__.model_fields.keys()
 
-    def __iter__(self) -> Iterator[tuple[str, Any]]:
+    def __iter__(self) -> Generator[tuple[str, Any], None, None]:
         for name in self.__class__.model_fields.keys():
             yield name, getattr(self, name)
 
@@ -62,8 +62,10 @@ class AppConfig(FrozenBaseModel):
     shared_parameters: SharedParameters
     wave_specific_parameters: list[WaveSpecificParameters]
 
+    # If I use `Self` as the return type,
+    # mypy report error "Cannot infer function type argument  [misc]"
     @model_validator(mode="after")
-    def validate_voltages(self) -> Self:
+    def validate_voltages(self) -> "AppConfig":
         if (v := sum(wgp.proportion for wgp in self.wave_specific_parameters)) != 1:
             raise ValueError(f"The sum of all proportions should be 1. Now it's {v}")
         return self

@@ -14,11 +14,8 @@ from blonder_tinkham_klapwijk_model.plotting import (
     plot_experiment_measurement,
 )
 
-CONFIG_PATH = "/Users/shapeless_cat/Projects/blonder-tinkham-klapwijk-model/src/blonder_tinkham_klapwijk_model/input_parameters.toml"
-DATA_PATH = "/Users/shapeless_cat/Projects/blonder-tinkham-klapwijk-model/src/blonder_tinkham_klapwijk_model/3K_modified.dat"
 
-
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
         prog='BTK data plotting and fitting',
         description='Plot BTK data from experiment and find the best curve that can fit it.',
