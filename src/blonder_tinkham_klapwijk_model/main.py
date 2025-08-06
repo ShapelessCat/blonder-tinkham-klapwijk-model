@@ -1,5 +1,7 @@
 import argparse
 import operator
+import sys
+from argparse import ArgumentParser
 from functools import reduce
 
 import numpy as np
@@ -15,13 +17,23 @@ from blonder_tinkham_klapwijk_model.plotting import (
 )
 
 
-def main() -> None:
+def build_parser() -> ArgumentParser:
     parser = argparse.ArgumentParser(
         prog='BTK data plotting and fitting',
         description='Plot BTK data from experiment and find the best curve that can fit it.',
     )
     parser.add_argument('-d', '--data')
     parser.add_argument('-c', '--config')
+    return parser
+
+
+def main() -> None:
+    parser = build_parser()
+
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(0)
+
     args = parser.parse_args()
     print(args.config, args.data)
 
