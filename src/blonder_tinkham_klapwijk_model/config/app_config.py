@@ -1,6 +1,6 @@
 import logging
 from collections.abc import Mapping
-from typing import Any, final, KeysView, Generator
+from typing import Any, Generator, KeysView, final
 
 from pydantic import BaseModel, model_validator
 

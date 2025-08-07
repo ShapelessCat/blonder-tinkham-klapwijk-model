@@ -16,14 +16,48 @@ from blonder_tinkham_klapwijk_model.plotting import (
     plot_experiment_measurement,
 )
 
+EPILOG = """
+Example config file (specified through -c/--config):\n
+  ```toml
+  [shared_parameters]
+  max_voltage = 30
+  n_points = 151
+  d_temperature = 10
+  temperature = 5
+  angle = 45 # degree
+  
+  [[wave_specific_parameters]]
+  proportion = 0.5
+  broadening_parameter = 0.01                  # Γ (meV)
+  barrier_strength = 20                        # Z - dimensionless
+  gap_config = { gap_plus = 4, gap_minus = 4 } # Δ (meV)
+  wave_type = "anisotropic"
+  
+  [[wave_specific_parameters]]
+  proportion = 0.5
+  broadening_parameter = 0.01  # Γ (meV)
+  barrier_strength = 20        # Z - dimensionless
+  gap_config = { gap = 8 }     # Δ (meV)
+  wave_type = "isotropic"
+  ```
+"""
+
 
 def build_parser() -> ArgumentParser:
     parser = argparse.ArgumentParser(
         prog='BTK data plotting and fitting',
+        formatter_class=argparse.RawTextHelpFormatter,  # Preserves formatting
         description='Plot BTK data from experiment and find the best curve that can fit it.',
+        epilog=EPILOG,
     )
-    parser.add_argument('-d', '--data')
-    parser.add_argument('-c', '--config')
+    parser.add_argument(
+        '-d',
+        '--data',
+        help='Specify a data file path. The first column should be bias voltage (mV), and second column should be normalized conductance.',
+    )
+    parser.add_argument(
+        '-c', '--config', help='Specify theoretical curve configuration.'
+    )
     return parser
 
 
