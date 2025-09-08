@@ -12,6 +12,7 @@ from .config.atomic_orbital import AtomicOrbital
 from .fermi_window_for_tunneling import fermi_window_for_tunneling
 from .transparency import normal_transparency_of
 from .waves.anisotropic_s import anisotropic_s
+from .waves.d import d
 from .waves.isotropic_wave import isotropic_wave
 
 
@@ -60,7 +61,7 @@ def calculate_gap_characteristics(
                 barrier_strength,
                 isotropic_gap_config,
             )
-        case (AtomicOrbital.S, AnisotropicGapConfig() as anisotropic_gap_config):
+        case (_, AnisotropicGapConfig() as anisotropic_gap_config):
             return calculate_anisomorphic_gap_characteristics(
                 max_voltage,
                 n_points,
@@ -71,6 +72,7 @@ def calculate_gap_characteristics(
                 broadening_parameter,
                 barrier_strength,
                 anisotropic_gap_config,
+                atomic_orbital,
             )
         case _:
             raise ValueError("Should never reach here!")
@@ -88,6 +90,7 @@ def calculate_anisomorphic_gap_characteristics(
     broadening_parameter: float,  # Γ (meV)
     barrier_strength: float,  # Z (dimensionless)
     gap_config: AnisotropicGapConfig,  # Δ (meV)
+    atomic_orbital: AtomicOrbital,
 ) -> GapCharacteristics:
     def compute_normalization_conductance_factor() -> float:
         def f(theta: float):
@@ -105,15 +108,27 @@ def calculate_anisomorphic_gap_characteristics(
     dos0: NDArray[np.float64] = np.zeros_like(energy)
 
     def anisotropic_wave_(theta, e):
-        return anisotropic_s(
-            theta,
-            e,
-            broadening_parameter,
-            barrier_strength,
-            gap_config,
-            angle,
-            normalization_conductance_factor,
-        )
+        match atomic_orbital:
+            case AtomicOrbital.S:
+                return anisotropic_s(
+                    theta,
+                    e,
+                    broadening_parameter,
+                    barrier_strength,
+                    gap_config,
+                    angle,
+                    normalization_conductance_factor,
+                )
+            case AtomicOrbital.D:
+                return d(
+                    theta,
+                    e,
+                    broadening_parameter,
+                    barrier_strength,
+                    gap_config,
+                    angle,
+                    normalization_conductance_factor,
+                )
 
     for n in range((pointnum + 1) // 2):
         energy[n] = n * (max_voltage + d_temperature + 1) / 500
