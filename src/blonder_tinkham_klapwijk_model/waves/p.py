@@ -7,6 +7,7 @@ from blonder_tinkham_klapwijk_model.transparency import (
     normal_transparency_of,
     superconductor_transparency_of,
 )
+from . import gamma_function_of
 
 
 def p(
@@ -66,7 +67,3 @@ def p(
         * cos_theta
         / normalization_conductance_factor
     )
-
-
-def gamma_function_of(energy: complex, delta: float) -> complex:
-    return energy / np.abs(delta) - np.sqrt((energy / np.abs(delta)) ** 2 - 1)
