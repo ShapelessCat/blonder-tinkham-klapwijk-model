@@ -4,13 +4,13 @@ from .app_config import (
     AppConfig,
     SharedParameters,
     SingleGapParameters,
-    WaveSpecificParameters,
+    AtomicOrbitalSpecificParameters,
 )
 
 __all__ = [
     "AppConfig",
     "SharedParameters",
-    "WaveSpecificParameters",
+    "AtomicOrbitalSpecificParameters",
     "SingleGapParameters",
     "load_config",
 ]

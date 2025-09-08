@@ -4,12 +4,12 @@ from typing import final
 
 @final
 @dataclass(frozen=True)
-class IsotropicGapConfig:
-    gap: float
+class S0Formula:
+    pass
 
 
 @final
 @dataclass(frozen=True)
-class AnisotropicGapConfig:
-    gap_plus: float
-    gap_minus: float
+class S1Formula:
+    epsilon: float
+    symmetry: int

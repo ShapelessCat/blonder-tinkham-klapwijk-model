@@ -26,19 +26,19 @@ Example config file (specified through -c/--config):\n
   temperature = 5
   angle = 45 # degree
   
-  [[wave_specific_parameters]]
+  [[atomic_orbital_specific_parameters]]
   proportion = 0.5
   broadening_parameter = 0.01                  # Γ (meV)
   barrier_strength = 20                        # Z - dimensionless
   gap_config = { gap_plus = 4, gap_minus = 4 } # Δ (meV)
-  wave_type = "anisotropic"
+  atomic_orbital = "s"
   
-  [[wave_specific_parameters]]
+  [[atomic_orbital_specific_parameters]]
   proportion = 0.5
   broadening_parameter = 0.01  # Γ (meV)
   barrier_strength = 20        # Z - dimensionless
   gap_config = { gap = 8 }     # Δ (meV)
-  wave_type = "isotropic"
+  atomic_orbital = "s"
   ```
 """
 
@@ -86,7 +86,7 @@ def main() -> None:
         operator.add,
         (
             calculate_gap_characteristics(**app_config_.config_set(idx))
-            for idx in range(len(app_config_.wave_specific_parameters))
+            for idx in range(len(app_config_.atomic_orbital_specific_parameters))
         ),
     )
     plot_btk_tunneling_fit(summarized_gap_characteristics)

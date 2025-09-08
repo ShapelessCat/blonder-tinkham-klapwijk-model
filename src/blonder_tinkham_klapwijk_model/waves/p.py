@@ -2,24 +2,24 @@ from typing import Final
 
 import numpy as np
 
-from blonder_tinkham_klapwijk_model.config.gap_config import (
-    ComplexGapConfig,
-    SimpleGapConfig,
-)
+from blonder_tinkham_klapwijk_model.config.gap_config import AnisotropicGapConfig
 from blonder_tinkham_klapwijk_model.transparency import (
     normal_transparency_of,
     superconductor_transparency_of,
 )
+from . import gamma_function_of
+from blonder_tinkham_klapwijk_model.config.formula_type import S0Formula, S1Formula
 
 
-def anisotropic_wave(
+def p(
     theta: float,
     energy: float,
     broadening_parameter: float,
     barrier_strength: float,
-    gap_config: SimpleGapConfig | ComplexGapConfig,
+    gap_config: AnisotropicGapConfig,
     angle: float,
     normalization_conductance_factor: float,
+    formula_type: S0Formula | S1Formula,
 ) -> float:
     """Calculates the integral function for superconducting transport calculations.
 
@@ -37,8 +37,8 @@ def anisotropic_wave(
     barrier_strength : float
         Barrier strength (dimensionless)
 
-    gap_config : SimpleGapConfig | ComplexGapConfig
-       Superconducting gap or (gap_plus, gap_minus) in eV
+    gap_config : AnisotropicGapConfig
+       Superconducting (gap_plus, gap_minus) in eV
 
     angle : float
         Crystallographic orientation angle in degrees
@@ -50,18 +50,8 @@ def anisotropic_wave(
     -------
         Calculated conductivity function value(s)
     """
-    match gap_config:
-        case SimpleGapConfig() as s:
-            gap_plus = s.gap
-            gap_minus = s.gap
-        case ComplexGapConfig() as c:
-            gap_plus = c.gap_plus
-            gap_minus = c.gap_minus
-        case _:
-            raise ValueError("Should never reach here!")
-
-    delta_plus = gap_plus * np.cos(2 * (theta - np.deg2rad(angle))) ** 4
-    delta_minus = gap_minus * np.cos(2 * (-theta - np.deg2rad(angle))) ** 4
+    delta_plus = gap_config.gap_plus * np.cos(theta - np.deg2rad(angle))
+    delta_minus = gap_config.gap_minus * np.cos(-theta - np.deg2rad(angle))
 
     # Complex energy with broadening
     complex_energy: Final[complex] = energy + 1j * broadening_parameter
@@ -79,7 +69,3 @@ def anisotropic_wave(
         * cos_theta
         / normalization_conductance_factor
     )
-
-
-def gamma_function_of(energy: complex, delta: float) -> complex:
-    return energy / np.abs(delta) - np.sqrt((energy / np.abs(delta)) ** 2 - 1)
