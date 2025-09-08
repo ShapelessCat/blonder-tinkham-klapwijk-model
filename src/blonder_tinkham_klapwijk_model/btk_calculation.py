@@ -7,11 +7,11 @@ from scipy.integrate import quad
 from scipy.interpolate import make_interp_spline
 
 from . import ABS_ERR_TOLERANCE, HALF_PI
-from .config.gap_config import ComplexGapConfig, SimpleGapConfig
-from .config.wave_type import WaveType
+from .config.gap_config import IsotropicGapConfig, AnisotropicGapConfig
+from .config.atomic_orbital import AtomicOrbital
 from .fermi_window_for_tunneling import fermi_window_for_tunneling
 from .transparency import normal_transparency_of
-from .waves.anisotropic_wave import anisotropic_wave
+from .waves.anisotropic_s import anisotropic_s
 from .waves.isotropic_wave import isotropic_wave
 
 
@@ -45,11 +45,22 @@ def calculate_gap_characteristics(
     proportion: float,
     broadening_parameter: float,  # Γ (meV)
     barrier_strength: float,  # Z (dimensionless)
-    gap_config: SimpleGapConfig | ComplexGapConfig,  # Δ (meV)
-    wave_type: WaveType,
+    gap_config: IsotropicGapConfig | AnisotropicGapConfig,  # Δ (meV)
+    atomic_orbital: AtomicOrbital,
 ) -> GapCharacteristics:
-    match (wave_type, gap_config):
-        case (WaveType.ANISOTROPIC, _):
+    match (atomic_orbital, gap_config):
+        case (AtomicOrbital.S, IsotropicGapConfig() as isotropic_gap_config):
+            return calculate_isomorphic_s_gap_characteristics(
+                max_voltage,
+                n_points,
+                d_temperature,
+                temperature,
+                proportion,
+                broadening_parameter,
+                barrier_strength,
+                isotropic_gap_config,
+            )
+        case (AtomicOrbital.S, AnisotropicGapConfig() as anisotropic_gap_config):
             return calculate_anisomorphic_gap_characteristics(
                 max_voltage,
                 n_points,
@@ -59,18 +70,7 @@ def calculate_gap_characteristics(
                 proportion,
                 broadening_parameter,
                 barrier_strength,
-                gap_config,
-            )
-        case (WaveType.ISOTROPIC, _) if isinstance(gap_config, SimpleGapConfig):
-            return calculate_isomorphic_gap_characteristics(
-                max_voltage,
-                n_points,
-                d_temperature,
-                temperature,
-                proportion,
-                broadening_parameter,
-                barrier_strength,
-                gap_config.gap,
+                anisotropic_gap_config,
             )
         case _:
             raise ValueError("Should never reach here!")
@@ -87,7 +87,7 @@ def calculate_anisomorphic_gap_characteristics(
     proportion: float,
     broadening_parameter: float,  # Γ (meV)
     barrier_strength: float,  # Z (dimensionless)
-    gap_config: SimpleGapConfig | ComplexGapConfig,  # Δ (meV)
+    gap_config: AnisotropicGapConfig,  # Δ (meV)
 ) -> GapCharacteristics:
     def compute_normalization_conductance_factor() -> float:
         def f(theta: float):
@@ -105,7 +105,7 @@ def calculate_anisomorphic_gap_characteristics(
     dos0: NDArray[np.float64] = np.zeros_like(energy)
 
     def anisotropic_wave_(theta, e):
-        return anisotropic_wave(
+        return anisotropic_s(
             theta,
             e,
             broadening_parameter,
@@ -167,7 +167,7 @@ def calculate_anisomorphic_gap_characteristics(
     return GapCharacteristics(current * proportion, didv * proportion, voltage)
 
 
-def calculate_isomorphic_gap_characteristics(
+def calculate_isomorphic_s_gap_characteristics(
     # shared
     max_voltage: float,  # mV
     n_points: int,  # dimensionless
@@ -177,7 +177,7 @@ def calculate_isomorphic_gap_characteristics(
     proportion: float,
     broadening_parameter: float,  # Γ (meV)
     barrier_strength: float,  # Z (dimensionless)
-    gap: float,  # Δ (meV)
+    gap_config: IsotropicGapConfig,  # Δ (meV)
 ) -> GapCharacteristics:
     def compute_normalization_conductance_factor() -> float:
         return 1 / (1 + barrier_strength**2)
@@ -194,7 +194,7 @@ def calculate_isomorphic_gap_characteristics(
             e,
             broadening_parameter,
             barrier_strength,
-            gap,
+            gap_config.gap,
             normalization_conductance_factor,
         )
 

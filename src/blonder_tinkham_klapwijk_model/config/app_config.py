@@ -6,7 +6,7 @@ from pydantic import BaseModel, model_validator
 
 from .gap_config import AnisotropicGapConfig, IsotropicGapConfig
 from .single_gap_parameters import SingleGapParameters
-from .wave_type import AtomicOrbitalType
+from .atomic_orbital import AtomicOrbital
 
 
 class FrozenBaseModel(BaseModel):
@@ -25,17 +25,17 @@ class SharedParameters(FrozenBaseModel):
 
 
 @final
-class WaveSpecificParameters(FrozenBaseModel, Mapping):
+class AtomicOrbitalSpecificParameters(FrozenBaseModel, Mapping):
     proportion: float
     broadening_parameter: float  # Γ (meV)
     barrier_strength: float  # Z (dimensionless)
     gap_config: IsotropicGapConfig | AnisotropicGapConfig  # Δ (meV)
-    atomic_orbital_type: AtomicOrbitalType
+    atomic_orbital: AtomicOrbital
 
     @model_validator(mode='after')
     def check_field_conflict(self):
-        match self.atomic_orbital_type:
-            case AtomicOrbitalType.S:
+        match self.atomic_orbital:
+            case AtomicOrbital.S:
                 pass
             case t if isinstance(gc := self.gap_config, IsotropicGapConfig):
                 raise ValueError(f"{t} atomic orbital can be isotropic wave: {gc}")
@@ -60,22 +60,22 @@ class WaveSpecificParameters(FrozenBaseModel, Mapping):
 @final
 class AppConfig(FrozenBaseModel):
     shared_parameters: SharedParameters
-    wave_specific_parameters: list[WaveSpecificParameters]
+    atomic_orbital_specific_parameters: list[AtomicOrbitalSpecificParameters]
 
     # If I use `Self` as the return type,
     # mypy report error "Cannot infer function type argument  [misc]"
     @model_validator(mode="after")
     def validate_voltages(self) -> "AppConfig":
-        if (v := sum(wgp.proportion for wgp in self.wave_specific_parameters)) != 1:
+        if (v := sum(wgp.proportion for wgp in self.atomic_orbital_specific_parameters)) != 1:
             raise ValueError(f"The sum of all proportions should be 1. Now it's {v}")
         return self
 
     def config_set(self, index: int) -> SingleGapParameters:
         try:
-            wsp = self.wave_specific_parameters[index]
+            wsp = self.atomic_orbital_specific_parameters[index]
         except IndexError:
             logging.error(
-                f"Config only has {len(self.wave_specific_parameters)} set(s) of gap specific parameters."
+                f"Config only has {len(self.atomic_orbital_specific_parameters)} set(s) of gap specific parameters."
             )
             raise
         return SingleGapParameters(**self.shared_parameters.model_dump(), **wsp)
