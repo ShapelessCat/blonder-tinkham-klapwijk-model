@@ -4,9 +4,9 @@ from typing import Any, Generator, KeysView, final
 
 from pydantic import BaseModel, model_validator
 
-from .gap_config import ComplexGapConfig, SimpleGapConfig
+from .gap_config import AnisotropicGapConfig, IsotropicGapConfig
 from .single_gap_parameters import SingleGapParameters
-from .wave_type import WaveType
+from .wave_type import AtomicOrbitalType
 
 
 class FrozenBaseModel(BaseModel):
@@ -29,16 +29,16 @@ class WaveSpecificParameters(FrozenBaseModel, Mapping):
     proportion: float
     broadening_parameter: float  # Γ (meV)
     barrier_strength: float  # Z (dimensionless)
-    gap_config: SimpleGapConfig | ComplexGapConfig  # Δ (meV)
-    wave_type: WaveType
+    gap_config: IsotropicGapConfig | AnisotropicGapConfig  # Δ (meV)
+    atomic_orbital_type: AtomicOrbitalType
 
     @model_validator(mode='after')
     def check_field_conflict(self):
-        match self.wave_type:
-            case WaveType.ISOTROPIC if isinstance(
-                gc := self.gap_config, ComplexGapConfig
-            ):
-                raise ValueError(f"Isotropic wave can't have complex gap config: {gc}")
+        match self.atomic_orbital_type:
+            case AtomicOrbitalType.S:
+                pass
+            case t if isinstance(gc := self.gap_config, IsotropicGapConfig):
+                raise ValueError(f"{t} atomic orbital can be isotropic wave: {gc}")
             case _:
                 pass
         return self

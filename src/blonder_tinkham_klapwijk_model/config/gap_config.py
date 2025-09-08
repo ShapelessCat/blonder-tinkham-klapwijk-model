@@ -4,12 +4,12 @@ from typing import final
 
 @final
 @dataclass(frozen=True)
-class SimpleGapConfig:
+class IsotropicGapConfig:
     gap: float
 
 
 @final
 @dataclass(frozen=True)
-class ComplexGapConfig:
+class AnisotropicGapConfig:
     gap_plus: float
     gap_minus: float
