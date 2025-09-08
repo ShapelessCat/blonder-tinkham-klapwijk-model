@@ -14,6 +14,7 @@ from .transparency import normal_transparency_of
 from .waves.anisotropic_s import anisotropic_s
 from .waves.d import d
 from .waves.isotropic_wave import isotropic_wave
+from .waves.p import p
 
 
 @final
@@ -121,6 +122,16 @@ def calculate_anisomorphic_gap_characteristics(
                 )
             case AtomicOrbital.D:
                 return d(
+                    theta,
+                    e,
+                    broadening_parameter,
+                    barrier_strength,
+                    gap_config,
+                    angle,
+                    normalization_conductance_factor,
+                )
+            case AtomicOrbital.P:
+                return p(
                     theta,
                     e,
                     broadening_parameter,
