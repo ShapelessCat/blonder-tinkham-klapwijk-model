@@ -8,6 +8,7 @@ from blonder_tinkham_klapwijk_model.transparency import (
     superconductor_transparency_of,
 )
 from . import gamma_function_of
+from blonder_tinkham_klapwijk_model.config.formula_type import S0Formula, S1Formula
 
 
 def p(
@@ -18,6 +19,7 @@ def p(
     gap_config: AnisotropicGapConfig,
     angle: float,
     normalization_conductance_factor: float,
+    formula_type: S0Formula | S1Formula,
 ) -> float:
     """Calculates the integral function for superconducting transport calculations.
 

@@ -10,9 +10,8 @@ proportion = 0.5
 broadening_parameter = 0.01  # Γ (meV)
 barrier_strength = 20        # Z - dimensionless
 gap_config = { gap_plus = 4, gap_minus = 5 } # Δ (meV)
-# ratio
-# gap_config = { gap = 4 } # Δ (meV)
-atomic_orbital = "p"
+atomic_orbital = "s"
+#formula_type = { epsilon = 0.01, symmetry = 2 }
 
 [[atomic_orbital_specific_parameters]]
 proportion = 0.5

@@ -6,6 +6,7 @@ from blonder_tinkham_klapwijk_model.transparency import (
     superconductor_transparency_of,
 )
 from . import gamma_function_of
+from blonder_tinkham_klapwijk_model.config.formula_type import S0Formula, S1Formula
 
 
 def isotropic_s(
@@ -14,6 +15,7 @@ def isotropic_s(
     barrier_strength: float,
     gap_config: IsotropicGapConfig,
     normalization_conductance_factor: float,
+    formula_type: S0Formula | S1Formula,
 ) -> float:
     """Calculates the integral function for superconducting transport calculations.
 

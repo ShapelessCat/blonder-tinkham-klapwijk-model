@@ -2,8 +2,9 @@ import logging
 from collections.abc import Mapping
 from typing import Any, Generator, KeysView, final
 
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, model_validator, Field
 
+from .formula_type import S0Formula, S1Formula
 from .gap_config import AnisotropicGapConfig, IsotropicGapConfig
 from .single_gap_parameters import SingleGapParameters
 from .atomic_orbital import AtomicOrbital
@@ -31,6 +32,7 @@ class AtomicOrbitalSpecificParameters(FrozenBaseModel, Mapping):
     barrier_strength: float  # Z (dimensionless)
     gap_config: IsotropicGapConfig | AnisotropicGapConfig  # Δ (meV)
     atomic_orbital: AtomicOrbital
+    formula_type: S0Formula | S1Formula = Field(default_factory=S0Formula)
 
     @model_validator(mode='after')
     def check_field_conflict(self):

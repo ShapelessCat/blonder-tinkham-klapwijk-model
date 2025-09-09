@@ -7,6 +7,7 @@ from scipy.integrate import quad
 from scipy.interpolate import make_interp_spline
 
 from . import ABS_ERR_TOLERANCE, HALF_PI
+from .config.formula_type import S0Formula, S1Formula
 from .config.gap_config import IsotropicGapConfig, AnisotropicGapConfig
 from .config.atomic_orbital import AtomicOrbital
 from .fermi_window_for_tunneling import fermi_window_for_tunneling
@@ -49,6 +50,7 @@ def calculate_gap_characteristics(
     barrier_strength: float,  # Z (dimensionless)
     gap_config: IsotropicGapConfig | AnisotropicGapConfig,  # Δ (meV)
     atomic_orbital: AtomicOrbital,
+    formula_type: S0Formula | S1Formula,
 ) -> GapCharacteristics:
     match (atomic_orbital, gap_config):
         case (AtomicOrbital.S, IsotropicGapConfig() as isotropic_gap_config):
@@ -61,6 +63,7 @@ def calculate_gap_characteristics(
                 broadening_parameter,
                 barrier_strength,
                 isotropic_gap_config,
+                formula_type,
             )
         case (_, AnisotropicGapConfig() as anisotropic_gap_config):
             return calculate_anisomorphic_gap_characteristics(
@@ -74,6 +77,7 @@ def calculate_gap_characteristics(
                 barrier_strength,
                 anisotropic_gap_config,
                 atomic_orbital,
+                formula_type,
             )
         case _:
             raise ValueError("Should never reach here!")
@@ -92,6 +96,7 @@ def calculate_anisomorphic_gap_characteristics(
     barrier_strength: float,  # Z (dimensionless)
     gap_config: AnisotropicGapConfig,  # Δ (meV)
     atomic_orbital: AtomicOrbital,
+    formula_type: S0Formula | S1Formula,
 ) -> GapCharacteristics:
     def compute_normalization_conductance_factor() -> float:
         def f(theta: float):
@@ -119,6 +124,7 @@ def calculate_anisomorphic_gap_characteristics(
                     gap_config,
                     angle,
                     normalization_conductance_factor,
+                    formula_type,
                 )
             case AtomicOrbital.D:
                 return d(
@@ -129,6 +135,7 @@ def calculate_anisomorphic_gap_characteristics(
                     gap_config,
                     angle,
                     normalization_conductance_factor,
+                    formula_type,
                 )
             case AtomicOrbital.P:
                 return p(
@@ -139,6 +146,7 @@ def calculate_anisomorphic_gap_characteristics(
                     gap_config,
                     angle,
                     normalization_conductance_factor,
+                    formula_type,
                 )
 
     for n in range((pointnum + 1) // 2):
@@ -204,6 +212,7 @@ def calculate_isomorphic_s_gap_characteristics(
     broadening_parameter: float,  # Γ (meV)
     barrier_strength: float,  # Z (dimensionless)
     gap_config: IsotropicGapConfig,  # Δ (meV)
+    formula_type: S0Formula | S1Formula,
 ) -> GapCharacteristics:
     def compute_normalization_conductance_factor() -> float:
         return 1 / (1 + barrier_strength**2)
@@ -222,6 +231,7 @@ def calculate_isomorphic_s_gap_characteristics(
             barrier_strength,
             gap_config,
             normalization_conductance_factor,
+            formula_type,
         )
 
     # energy: float,

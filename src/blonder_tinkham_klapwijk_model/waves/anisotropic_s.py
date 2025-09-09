@@ -8,6 +8,7 @@ from blonder_tinkham_klapwijk_model.transparency import (
     superconductor_transparency_of,
 )
 from . import gamma_function_of
+from blonder_tinkham_klapwijk_model.config.formula_type import S0Formula, S1Formula
 
 
 def anisotropic_s(
@@ -18,6 +19,7 @@ def anisotropic_s(
     gap_config: AnisotropicGapConfig,
     angle: float,
     normalization_conductance_factor: float,
+    formula_type: S0Formula | S1Formula,
 ) -> float:
     """Calculates the integral function for superconducting transport calculations.
 
@@ -48,8 +50,13 @@ def anisotropic_s(
     -------
         Calculated conductivity function value(s)
     """
-    delta_plus = gap_config.gap_plus * np.cos(2 * (theta - np.deg2rad(angle))) ** 4
-    delta_minus = gap_config.gap_minus * np.cos(2 * (-theta - np.deg2rad(angle))) ** 4
+    match formula_type:
+        case S0Formula():
+            delta_plus = gap_config.gap_plus * np.cos(2 * (theta - np.deg2rad(angle))) ** 4
+            delta_minus = gap_config.gap_minus * np.cos(2 * (-theta - np.deg2rad(angle))) ** 4
+        case S1Formula() as s1:
+            delta_plus = gap_config.gap_plus * (s1.epsilon * np.cos(s1.symmetry * (theta - np.deg2rad(angle))) + 1)
+            delta_minus = gap_config.gap_minus * (s1.epsilon * np.cos(s1.symmetry * (-theta - np.deg2rad(angle))) + 1)
 
     # Complex energy with broadening
     complex_energy: Final[complex] = energy + 1j * broadening_parameter
