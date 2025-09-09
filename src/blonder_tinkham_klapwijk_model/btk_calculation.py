@@ -13,7 +13,7 @@ from .fermi_window_for_tunneling import fermi_window_for_tunneling
 from .transparency import normal_transparency_of
 from .waves.anisotropic_s import anisotropic_s
 from .waves.d import d
-from .waves.isotropic_wave import isotropic_wave
+from .waves.isotropic_s import isotropic_s
 from .waves.p import p
 
 
@@ -216,11 +216,11 @@ def calculate_isomorphic_s_gap_characteristics(
     dos0: NDArray[np.float64] = np.zeros_like(energy)
 
     def isotropic_wave_(e):
-        return isotropic_wave(
+        return isotropic_s(
             e,
             broadening_parameter,
             barrier_strength,
-            gap_config.gap,
+            gap_config,
             normalization_conductance_factor,
         )
 
