@@ -32,7 +32,7 @@ virtual environment has been created and activated.**
 1. Package this project to a *.pyz* format file:
 
    ```shell
-   shiv -e blonder-tinkham-klapwijk-model.main:main -o btk.x .
+   shiv -e blonder_tinkham_klapwijk_model.main:main -o btk.x .
    ```
    
 2. Run this package project through command line:
